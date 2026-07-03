@@ -27,9 +27,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.maxrave.simpmusic.Platform
 import com.maxrave.simpmusic.expect.ui.DiscordWebView
 import com.maxrave.simpmusic.expect.ui.rememberWebViewState
 import com.maxrave.simpmusic.extension.getStringBlocking
+import com.maxrave.simpmusic.getPlatform
 import com.maxrave.simpmusic.ui.component.DevLogInBottomSheet
 import com.maxrave.simpmusic.ui.component.DevLogInType
 import com.maxrave.simpmusic.ui.component.RippleIconButton
@@ -51,8 +53,11 @@ fun DiscordLoginScreen(
     hideBottomNavigation: () -> Unit,
     showBottomNavigation: () -> Unit,
 ) {
+    // Desktop has no real embedded WebView (see DiscordWebView's desktop actual), so the
+    // token-paste sheet IS the login flow there — open it by default instead of requiring
+    // users to find the small top-bar icon.
     var devLoginSheet by rememberSaveable {
-        mutableStateOf(false)
+        mutableStateOf(getPlatform() == Platform.Desktop)
     }
     // Hide bottom navigation when entering this screen
     LaunchedEffect(Unit) {

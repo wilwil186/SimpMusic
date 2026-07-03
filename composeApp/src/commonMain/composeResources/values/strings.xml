@@ -505,8 +505,10 @@
     <string name="mix_for_you">Mix for you</string>
     <string name="no_mixes_found">No mixes found</string>
     <string name="no_charts_found">No charts found</string>
-    <string name="desktop_webview_description">Because of the limitations of Compose Multiplatform, I can not implement WebView on desktop.\nRead this to learn more how to log in in desktop:\n</string>
-    <string name="open_blog_post">Open blog post</string>
+    <string name="desktop_webview_description">Log in above, then use the SimpMusic Utils extension to copy your session and paste it below.</string>
+    <string name="desktop_discord_webview_description">Log in to Discord in your browser, copy your token, then paste it below.</string>
+    <string name="desktop_open_login_page">Log in with Google</string>
+    <string name="desktop_get_extension">Get the SimpMusic Utils extension</string>
     <string name="discord_integration">Discord integration</string>
     <string name="log_in_to_discord">Log in to Discord</string>
     <string name="intro_login_to_discord">Log in to enable Discord Rich Presence</string>

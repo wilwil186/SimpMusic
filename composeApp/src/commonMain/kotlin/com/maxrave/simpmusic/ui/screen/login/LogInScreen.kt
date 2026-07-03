@@ -31,11 +31,13 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.maxrave.common.Config
 import com.maxrave.logger.Logger
+import com.maxrave.simpmusic.Platform
 import com.maxrave.simpmusic.expect.ui.PlatformWebView
 import com.maxrave.simpmusic.expect.ui.createWebViewCookieManager
 import com.maxrave.simpmusic.expect.ui.rememberWebViewState
 import com.maxrave.simpmusic.ui.component.DevLogInBottomSheet
 import com.maxrave.simpmusic.ui.component.DevLogInType
+import com.maxrave.simpmusic.getPlatform
 import com.maxrave.simpmusic.ui.component.RippleIconButton
 import com.maxrave.simpmusic.ui.theme.typo
 import com.maxrave.simpmusic.viewModel.LogInViewModel
@@ -67,8 +69,11 @@ fun LoginScreen(
 ) {
     val hazeState = rememberHazeState()
     val coroutineScope = rememberCoroutineScope()
+    // Desktop has no real embedded WebView (see PlatformWebView's desktop actual), so the
+    // cookie-paste sheet IS the login flow there, not a hidden "Developer Mode" extra —
+    // open it by default instead of requiring users to find the small top-bar icon.
     var devLoginSheet by rememberSaveable {
-        mutableStateOf(false)
+        mutableStateOf(getPlatform() == Platform.Desktop)
     }
 
     val state = rememberWebViewState()
