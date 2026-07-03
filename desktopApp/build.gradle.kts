@@ -171,8 +171,11 @@ compose.desktop {
                     listOf(TargetFormat.Dmg, TargetFormat.Msi),
                 )
             } else {
+                // Linux host: Deb is the primary native installer for Debian/
+                // Ubuntu users (jpackage builds it via dpkg-deb + fakeroot).
+                // AppImage stays for the "one-for-all-distros" portable build.
                 listTarget.addAll(
-                    listOf(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.AppImage),
+                    listOf(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.AppImage, TargetFormat.Deb),
                 )
             }
             targetFormats(*listTarget.toTypedArray())
@@ -232,6 +235,13 @@ compose.desktop {
                         .get()
                         .removeSuffix("-hf")
                 iconFile.set(rootDir.resolve("composeApp/icon/circle_app_icon.png"))
+                // Debian package metadata — makes the generated .deb a proper
+                // desktop app: menu entry, category and maintainer for
+                // `dpkg -i` / apt install on Debian/Ubuntu.
+                debMaintainer = "maxrave-dev"
+                menuGroup = "SimpMusic"
+                appCategory = "Audio"
+                shortcut = true
             }
         }
 

@@ -307,7 +307,8 @@ Before implementing code, researching code, or answering technical questions, th
 ### Desktop
 - **Windows**: `.msi` installer
 - **macOS**: `.dmg` (ARM and x86-64)
-- **Linux**: `.AppImage` (DEB and RPM removed post-1.0.4)
+- **Linux**: `.AppImage` (portable, all distros) + `.deb` (Debian/Ubuntu, via jpackage `TargetFormat.Deb`). RPM removed post-1.0.4.
+  - Build the `.deb`: `./gradlew :composeApp:vlcSetup --no-configuration-cache` (once, to fetch VLC natives) → `./gradlew :desktopApp:packageDeb --no-configuration-cache`. Output: `desktopApp/build/compose/binaries/main/deb/simpmusic_<version>_amd64.deb`. Use `packageReleaseDeb` for a ProGuard-shrunk (smaller) build.
 
 ## 🚨 Important Notes
 
@@ -448,7 +449,8 @@ if (getPlatform() == Platform.Android) {
 
 ### Architecture Changes
 - **Desktop: GStreamer → VLCJ**: Completely replaced GStreamer with VLCJ for desktop audio playback
-- **DEB/RPM builds removed**: Desktop Linux now only ships AppImage
+- **DEB/RPM builds removed**: Desktop Linux shipped AppImage only (post-1.0.4)
+- **DEB build re-added (2026-07)**: `TargetFormat.Deb` added to `:desktopApp` `nativeDistributions` linux targets so jpackage produces `simpmusic_<version>_amd64.deb` for Debian/Ubuntu (menu entry + VLC natives + bundled JRE). RPM still not shipped.
 
 ### New Features (v1.0.4)
 - **Android Crossfade & DJ-style transition**: `CrossfadeExoPlayerAdapter` with auto mode (like AutoMix)
@@ -497,6 +499,6 @@ After completing any of the following types of changes, the AI agent **MUST** up
 
 *This document helps AI Agents quickly understand the SimpMusic project. Update regularly when there are major changes to architecture or structure.*
 
-**Last updated**: 2026-03-14
+**Last updated**: 2026-07-03
 **Project version**: Check latest release on GitHub
 **Maintained by**: maxrave-dev and contributors
