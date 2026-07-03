@@ -68,7 +68,7 @@ See screenshots in the upstream repo's [`asset/screenshot`](https://github.com/m
 - **macOS**: download the `.dmg`
 - **Linux**: `.deb` (Debian/Ubuntu, this fork) or `.AppImage` (portable, all distros, upstream)
 
-**Login guide**: https://www.simpmusic.org/blogs/en/how-to-log-in-on-desktop-app
+**How to log in (this fork)**: open *Settings → Log in*. Click **"Log in with Google"** (opens your browser), sign in to YouTube Music normally, then use the [SimpMusic Utils extension](https://github.com/maxrave-dev/utils) to extract your session cookie and paste it into the box the app shows automatically.
 **Discord login guide**: https://gist.github.com/MarvNC/e601f3603df22f36ebd3102c501116c6
 
 **Known limitations**:
