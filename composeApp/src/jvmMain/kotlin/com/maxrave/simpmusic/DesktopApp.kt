@@ -5,10 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.DpSize
@@ -54,6 +51,7 @@ import org.koin.core.context.loadKoinModules
 import org.koin.core.context.startKoin
 import org.koin.java.KoinJavaComponent.inject
 import org.koin.mp.KoinPlatform.getKoin
+import kotlin.system.exitProcess
 import simpmusic.composeapp.generated.resources.Res
 import simpmusic.composeapp.generated.resources.app_name
 import simpmusic.composeapp.generated.resources.circle_app_icon
@@ -177,36 +175,38 @@ fun runDesktopApp(args: Array<String> = emptyArray()) {
             rememberWindowState(
                 size = DpSize(1500.dp, 860.dp),
             )
-        var isVisible by remember { mutableStateOf(true) }
         // The single-instance guard now runs before startKoin (top of
         // runDesktopApp). Here we only react to a restore request raised when a
         // second instance launches: bring the window back to the foreground and
         // consume any deep link the second instance forwarded.
         LaunchedEffect(Unit) {
             DesktopRestoreSignal.requests.collect {
-                isVisible = true
                 windowState.isMinimized = false
                 DesktopDeepLinkHandler.consumePendingUri()
             }
         }
-        val openAppString = stringResource(Res.string.open_app)
         val quitAppString = stringResource(Res.string.quit_app)
         val openMiniPlayer = stringResource(Res.string.open_miniplayer)
         val closeMiniPlayer = stringResource(Res.string.close_miniplayer)
+        // Single quit path for the tray "Quit" item, the window's close button,
+        // and the custom title bar's close button. exitApplication() alone only
+        // tears down the Compose/AWT windows — it does NOT System.exit(). A
+        // non-daemon watcher thread inside SingleInstanceManager (started by
+        // isSingleInstance() above to detect second-instance launches) never
+        // stops itself, which keeps the JVM process alive in the background
+        // after every window is closed. exitProcess(0) forces a real exit.
+        val quitApp: () -> Unit = {
+            mediaPlayerHandler.release()
+            exitApplication()
+            exitProcess(0)
+        }
         Tray(
             icon = painterResource(Res.drawable.circle_app_icon),
             tooltip = stringResource(Res.string.app_name),
             primaryAction = {
-                isVisible = true
                 windowState.isMinimized = false
             },
         ) {
-            if (!isVisible) {
-                Item(openAppString) {
-                    isVisible = true
-                    windowState.isMinimized = false
-                }
-            }
             if (MiniPlayerManager.isOpen) {
                 Item(closeMiniPlayer) {
                     MiniPlayerManager.isOpen = false
@@ -218,8 +218,7 @@ fun runDesktopApp(args: Array<String> = emptyArray()) {
             }
             Divider()
             Item(quitAppString) {
-                mediaPlayerHandler.release()
-                exitApplication()
+                quitApp()
             }
         }
         // Detect virtual machines (Parallels, VirtualBox, VMware, etc.).
@@ -280,14 +279,13 @@ fun runDesktopApp(args: Array<String> = emptyArray()) {
             }
         Window(
             onCloseRequest = {
-                isVisible = false
+                quitApp()
             },
             title = stringResource(Res.string.app_name),
             icon = painterResource(Res.drawable.circle_app_icon),
             undecorated = !isVM,
             transparent = !isVM,
             state = windowState,
-            visible = isVisible,
         ) {
             Column(
                 modifier =
@@ -307,7 +305,7 @@ fun runDesktopApp(args: Array<String> = emptyArray()) {
                         windowState = windowState,
                         window = window,
                         onCloseRequest = {
-                            isVisible = false
+                            quitApp()
                         },
                     )
                 }
