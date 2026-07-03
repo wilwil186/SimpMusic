@@ -7,6 +7,18 @@ A FOSS YouTube Music client for Android and Desktop with many features from<br>S
 <br>
 <a href="https://www.producthunt.com/products/simpmusic/reviews?utm_source=badge-product_rating&utm_medium=badge&utm_source=badge-simpmusic" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/product_rating.svg?product_id=903836&theme=dark" alt="SimpMusic - A&#0032;FOSS&#0032;YouTube&#0032;Music&#0032;client&#0032;for&#0032;Android&#0032;with&#0032;many&#0032;features | Product Hunt" style="width: 242px; height: 108px;" width="242" height="108" /></a>
 <br> 
+<h2>⬇️ Download / Descargar</h2>
+<b>This fork ships ready-to-install builds — just click:</b><br>
+<b>Este fork publica builds listos para instalar — solo haz clic:</b>
+<br>
+<br>
+<a href="https://github.com/wilwil186/SimpMusic/releases/latest/download/SimpMusic-Desktop.deb"><img src="https://img.shields.io/badge/Debian%20%2F%20Ubuntu-Download%20.deb-A81D33?style=for-the-badge&logo=debian&logoColor=white" alt="Download .deb"></a>
+<a href="https://github.com/wilwil186/SimpMusic/releases/latest/download/SimpMusic-Android.apk"><img src="https://img.shields.io/badge/Android-Download%20.apk-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Download .apk"></a>
+<br>
+<sub>👉 Or browse every file on the <a href="https://github.com/wilwil186/SimpMusic/releases/latest"><b>Releases page</b></a> · O mira todos los archivos en la <a href="https://github.com/wilwil186/SimpMusic/releases/latest"><b>página de Releases</b></a></sub>
+<br>
+<br>
+
 <h4>Download</h4>  
 <a href="https://apt.izzysoft.de/packages/com.maxrave.simpmusic/"><img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png" width="200"></a> 
 <a href="https://f-droid.org/en/packages/com.maxrave.simpmusic/"><img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" width="200"></a> 
