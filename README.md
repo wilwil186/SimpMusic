@@ -1,13 +1,8 @@
-<div align="center">
-  <img src="https://raw.githubusercontent.com/maxrave-dev/SimpMusic/main/fastlane/metadata/android/en-US/images/featureGraphic.png" alt="SimpMusic banner">
+# SimpMusic
 
-  # SimpMusic
+A FOSS YouTube Music client for Android and Desktop, with features inspired by Spotify, SponsorBlock and ReturnYouTubeDislike — built with Compose Multiplatform.
 
-  A FOSS YouTube Music client for Android and Desktop, with features inspired by Spotify, SponsorBlock and ReturnYouTubeDislike — built with Compose Multiplatform.
-
-  [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
-  [![Crowdin](https://badges.crowdin.net/simpmusic/localized.svg)](https://crowdin.com/project/simpmusic)
-</div>
+[License: GPLv3](LICENSE) · [Translate on Crowdin](https://crowdin.com/project/simpmusic)
 
 ---
 
@@ -22,10 +17,8 @@ Este es el **fork personal de [wilwil186](https://github.com/wilwil186)** del pr
 **This fork's builds — click to download:**
 **Builds de este fork — haz clic para descargar:**
 
-<p>
-  <a href="https://github.com/wilwil186/SimpMusic/releases/latest/download/SimpMusic-Desktop.deb"><img src="https://img.shields.io/badge/Debian%20%2F%20Ubuntu-Download%20.deb-A81D33?style=for-the-badge&logo=debian&logoColor=white" alt="Download .deb"></a>
-  <a href="https://github.com/wilwil186/SimpMusic/releases/latest/download/SimpMusic-Android.apk"><img src="https://img.shields.io/badge/Android-Download%20.apk-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Download .apk"></a>
-</p>
+- 📦 [**Download SimpMusic-Desktop.deb**](https://github.com/wilwil186/SimpMusic/releases/latest/download/SimpMusic-Desktop.deb)
+- 📱 [**Download SimpMusic-Android.apk**](https://github.com/wilwil186/SimpMusic/releases/latest/download/SimpMusic-Android.apk)
 
 👉 Or browse every file on the [**Releases page**](https://github.com/wilwil186/SimpMusic/releases/latest) · O mira todos los archivos en la [**página de Releases**](https://github.com/wilwil186/SimpMusic/releases/latest)
 
@@ -66,35 +59,7 @@ Este es el **fork personal de [wilwil186](https://github.com/wilwil186)** del pr
 
 ## 📸 Screenshots
 
-<p align="center">
-  <img src="https://github.com/maxrave-dev/SimpMusic/blob/main/asset/screenshot/01.png?raw=true" width="200" />
-  <img src="https://github.com/maxrave-dev/SimpMusic/blob/main/asset/screenshot/02.png?raw=true" width="200" />
-  <img src="https://github.com/maxrave-dev/SimpMusic/blob/main/asset/screenshot/03.png?raw=true" width="200" />
-  <img src="https://github.com/maxrave-dev/SimpMusic/blob/main/asset/screenshot/04.png?raw=true" width="200" />
-</p>
-<p align="center">
-  <img src="https://github.com/maxrave-dev/SimpMusic/blob/main/asset/screenshot/05.png?raw=true" width="200" />
-  <img src="https://github.com/maxrave-dev/SimpMusic/blob/main/asset/screenshot/17.png?raw=true" width="200" />
-  <img src="https://github.com/maxrave-dev/SimpMusic/blob/main/asset/screenshot/07.png?raw=true" width="200" />
-  <img src="https://github.com/maxrave-dev/SimpMusic/blob/main/asset/screenshot/08.png?raw=true" width="200" />
-</p>
-<p align="center">
-  <img src="https://github.com/maxrave-dev/SimpMusic/blob/main/asset/screenshot/09.png?raw=true" width="200" />
-  <img src="https://github.com/maxrave-dev/SimpMusic/blob/main/asset/screenshot/10.png?raw=true" width="200" />
-  <img src="https://github.com/maxrave-dev/SimpMusic/blob/main/asset/screenshot/11.png?raw=true" width="200" />
-  <img src="https://github.com/maxrave-dev/SimpMusic/blob/main/asset/screenshot/12.png?raw=true" width="200" />
-</p>
-<p align="center">
-  <img src="https://github.com/maxrave-dev/SimpMusic/blob/main/asset/screenshot/13.png?raw=true" width="200" />
-  <img src="https://github.com/maxrave-dev/SimpMusic/blob/main/asset/screenshot/14.png?raw=true" width="200" />
-  <img src="https://github.com/maxrave-dev/SimpMusic/blob/main/asset/screenshot/15.png?raw=true" width="200" />
-  <img src="https://github.com/maxrave-dev/SimpMusic/blob/main/asset/screenshot/16.png?raw=true" width="200" />
-</p>
-<p align="center">
-  <img src="https://github.com/maxrave-dev/SimpMusic/blob/main/asset/screenshot/06.png?raw=true" width="800" />
-</p>
-
-More [screenshots here](https://photos.app.goo.gl/AbieoXG5ctDrpwzp7).
+See screenshots in the upstream repo's [`asset/screenshot`](https://github.com/maxrave-dev/SimpMusic/tree/main/asset/screenshot) folder, or [this album](https://photos.app.goo.gl/AbieoXG5ctDrpwzp7).
 
 ## 🖥️ Desktop app
 
