@@ -5,10 +5,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LogoDev
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -22,16 +26,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.maxrave.common.Config
 import com.maxrave.logger.Logger
 import com.maxrave.simpmusic.Platform
+import com.maxrave.simpmusic.expect.importGoogleCookiesFromBrowser
+import com.maxrave.simpmusic.expect.openUrl
 import com.maxrave.simpmusic.expect.ui.PlatformWebView
 import com.maxrave.simpmusic.expect.ui.createWebViewCookieManager
 import com.maxrave.simpmusic.expect.ui.rememberWebViewState
@@ -53,6 +61,11 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import simpmusic.composeapp.generated.resources.Res
 import simpmusic.composeapp.generated.resources.baseline_arrow_back_ios_new_24
+import simpmusic.composeapp.generated.resources.desktop_import_instruction
+import simpmusic.composeapp.generated.resources.desktop_import_no_session
+import simpmusic.composeapp.generated.resources.desktop_import_session
+import simpmusic.composeapp.generated.resources.desktop_importing
+import simpmusic.composeapp.generated.resources.desktop_open_login_page
 import simpmusic.composeapp.generated.resources.log_in
 import simpmusic.composeapp.generated.resources.login_failed
 import simpmusic.composeapp.generated.resources.login_success
@@ -69,12 +82,15 @@ fun LoginScreen(
 ) {
     val hazeState = rememberHazeState()
     val coroutineScope = rememberCoroutineScope()
-    // Desktop has no real embedded WebView (see PlatformWebView's desktop actual), so the
-    // cookie-paste sheet IS the login flow there, not a hidden "Developer Mode" extra —
-    // open it by default instead of requiring users to find the small top-bar icon.
+    // Desktop logs in by importing the existing Google session from the user's
+    // browser (see the Desktop branch below). The manual cookie-paste sheet is
+    // kept only as a fallback, reachable via the top-bar dev icon — so it stays
+    // closed by default on every platform now.
     var devLoginSheet by rememberSaveable {
-        mutableStateOf(getPlatform() == Platform.Desktop)
+        mutableStateOf(false)
     }
+    // Desktop: true while reading/decrypting the browser session.
+    var importing by remember { mutableStateOf(false) }
 
     val state = rememberWebViewState()
 
@@ -113,51 +129,120 @@ fun LoginScreen(
                         innerPadding.calculateTopPadding() + 64.dp,
                     ),
             )
-            // WebView for YouTube Music login
-            PlatformWebView(
-                state,
-                Config.LOG_IN_URL,
-                aboveContent = {
-                    if (devLoginSheet) {
-                        DevLogInBottomSheet(
-                            onDismiss = {
-                                devLoginSheet = false
-                            },
-                            onDone = { cookie ->
+            // The manual cookie-paste sheet, kept as a fallback for browsers we
+            // can't read automatically. Shared by both platform branches below.
+            val fallbackPasteSheet: @Composable () -> Unit = {
+                if (devLoginSheet) {
+                    DevLogInBottomSheet(
+                        onDismiss = {
+                            devLoginSheet = false
+                        },
+                        onDone = { cookie ->
+                            coroutineScope.launch {
+                                val success = settingsViewModel.addAccount(cookie)
+                                if (success) {
+                                    viewModel.makeToast(getString(Res.string.login_success))
+                                    navController.navigateUp()
+                                } else {
+                                    viewModel.makeToast(getString(Res.string.login_failed))
+                                }
+                            }
+                        },
+                        type = DevLogInType.YouTube,
+                    )
+                }
+            }
+
+            if (getPlatform() == Platform.Desktop) {
+                // Desktop: no embedded browser. Instead of pasting a cookie, the
+                // user signs in with Google in their normal browser, then we
+                // import that session straight from the browser's cookie store.
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.widthIn(max = 440.dp).padding(24.dp),
+                    ) {
+                        Text(
+                            text = stringResource(Res.string.desktop_import_instruction),
+                            style = typo().bodyMedium,
+                            textAlign = TextAlign.Center,
+                        )
+                        Spacer(Modifier.height(24.dp))
+                        Button(
+                            onClick = { openUrl(Config.LOG_IN_URL) },
+                            enabled = !importing,
+                        ) {
+                            Text(stringResource(Res.string.desktop_open_login_page))
+                        }
+                        Spacer(Modifier.height(12.dp))
+                        Button(
+                            onClick = {
+                                importing = true
                                 coroutineScope.launch {
-                                    val success = settingsViewModel.addAccount(cookie)
-                                    if (success) {
-                                        viewModel.makeToast(getString(Res.string.login_success))
-                                        navController.navigateUp()
+                                    val result = importGoogleCookiesFromBrowser()
+                                    if (result != null) {
+                                        val success =
+                                            settingsViewModel.addAccount(
+                                                result.cookieHeader,
+                                                result.netscapeCookie,
+                                            )
+                                        if (success) {
+                                            viewModel.makeToast(getString(Res.string.login_success))
+                                            navController.navigateUp()
+                                        } else {
+                                            viewModel.makeToast(getString(Res.string.login_failed))
+                                        }
                                     } else {
-                                        viewModel.makeToast(getString(Res.string.login_failed))
+                                        viewModel.makeToast(
+                                            getString(Res.string.desktop_import_no_session),
+                                        )
                                     }
+                                    importing = false
                                 }
                             },
-                            type = DevLogInType.YouTube,
-                        )
+                            enabled = !importing,
+                        ) {
+                            Text(stringResource(Res.string.desktop_import_session))
+                        }
+                        if (importing) {
+                            Spacer(Modifier.height(20.dp))
+                            CircularProgressIndicator()
+                            Spacer(Modifier.height(8.dp))
+                            Text(
+                                text = stringResource(Res.string.desktop_importing),
+                                style = typo().labelMedium,
+                            )
+                        }
                     }
+                    fallbackPasteSheet()
                 }
-            ) { url ->
-                Logger.d("LogInScreen", "Current URL: $url")
-                if (url == Config.YOUTUBE_MUSIC_MAIN_URL) {
-                    coroutineScope.launch {
-                        val success =
-                            createWebViewCookieManager()
-                                .getCookie(url)
-                                .takeIf {
-                                    it.isNotEmpty()
-                                }?.let {
-                                    settingsViewModel.addAccount(it)
-                                } ?: false
+            } else {
+                // WebView for YouTube Music login (Android)
+                PlatformWebView(
+                    state,
+                    Config.LOG_IN_URL,
+                    aboveContent = { fallbackPasteSheet() },
+                ) { url ->
+                    Logger.d("LogInScreen", "Current URL: $url")
+                    if (url == Config.YOUTUBE_MUSIC_MAIN_URL) {
+                        coroutineScope.launch {
+                            val success =
+                                createWebViewCookieManager()
+                                    .getCookie(url)
+                                    .takeIf {
+                                        it.isNotEmpty()
+                                    }?.let {
+                                        settingsViewModel.addAccount(it)
+                                    } ?: false
 
-                        createWebViewCookieManager().removeAllCookies()
+                            createWebViewCookieManager().removeAllCookies()
 
-                        if (success) {
-                            viewModel.makeToast(getString(Res.string.login_success))
-                            navController.navigateUp()
-                        } else {
-                            viewModel.makeToast(getString(Res.string.login_failed))
+                            if (success) {
+                                viewModel.makeToast(getString(Res.string.login_success))
+                                navController.navigateUp()
+                            } else {
+                                viewModel.makeToast(getString(Res.string.login_failed))
+                            }
                         }
                     }
                 }

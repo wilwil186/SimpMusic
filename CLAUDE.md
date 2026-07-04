@@ -328,7 +328,19 @@ Before implementing code, researching code, or answering technical questions, th
 #### Desktop
 - **Required Dependencies**:
   - VLCJ: Audio playback (bundled via vlc-setup plugin)
+  - `org.xerial:sqlite-jdbc` + `de.swiesend:secret-service` (jvmMain): power the
+    "Import session from browser" login — read the user's existing Google session
+    straight from Firefox/Chromium cookie stores (no extension, no cookie paste)
 - **Features**:
+  - **Import session from browser login**: Desktop login is now "Log in with
+    Google (in your normal browser)" → "Import session from browser". The app
+    reads YouTube cookies directly from Firefox (`cookies.sqlite`, plaintext) or
+    any Chromium browser (Brave/Chrome/Chromium/Edge/Vivaldi — `Cookies` SQLite,
+    AES-128-CBC `v10`/`v11` values decrypted with the OS-keyring key via the
+    Secret Service). See `composeApp/src/jvmMain/.../expect/BrowserCookieImport.jvm.kt`
+    (`expect fun importGoogleCookiesFromBrowser` in commonMain). The old
+    SimpMusic-Utils-extension + manual cookie paste remains as a fallback behind
+    the top-bar dev icon.
   - Deep link support (`simpmusic://` and `simpmusic.org`)
   - Mini Player window (always-on-top, resizable, draggable)
   - Crash dialog
@@ -474,6 +486,14 @@ if (getPlatform() == Platform.Android) {
 - **Desktop Crash dialog**: Error reporting UI for desktop
 - **Playback speed/pitch controls**: Redesigned UI with improved animations
 - **VM environment detection**: Disable transparency and custom titlebar in VMs
+- **Desktop "Import session from browser" login (2026-07)**: Replaced the
+  extension + manual YouTube-cookie paste as the primary desktop login. The user
+  signs in with Google in their normal browser, then one click imports the
+  session — the app reads/decrypts YouTube cookies from Firefox or any Chromium
+  browser. New deps: `org.xerial:sqlite-jdbc`, `de.swiesend:secret-service`
+  (3.0.0-alpha, matching the dbus-java 5.x already pulled by `:media-jvm`/jmtc).
+  Implementation: `importGoogleCookiesFromBrowser` (commonMain expect,
+  jvmMain actual). Manual paste kept as a fallback behind the dev icon.
 
 ## 🔄 CLAUDE.md Auto-Update Rule (MANDATORY)
 

@@ -176,6 +176,12 @@ kotlin {
             implementation(libs.sentry.jvm)
             implementation(libs.native.tray)
             implementation(projects.mediaJvmUi)
+            // Desktop "Import session from browser" login: read the user's
+            // existing Google session straight from their browser's cookie
+            // store (SQLite) and decrypt Chromium's encrypted values via the
+            // OS keyring (Secret Service). No extension, no manual paste.
+            implementation(libs.xerial.sqlite.jdbc)
+            implementation(libs.secret.service)
         }
     }
 }

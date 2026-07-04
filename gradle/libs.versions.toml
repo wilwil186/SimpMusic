@@ -65,6 +65,12 @@ composeHotReload = "1.1.1"
 composeMultiplatform = "1.11.1"
 datetime = "0.8.0"
 sqlite = "2.6.2"
+# Desktop-only: read the user's existing browser session for "Import from browser" login.
+xerial-sqlite = "3.53.2.0"
+# 3.0.0-alpha targets dbus-java 5.2.0, matching the 5.x already pulled by
+# :media-jvm (jmtc). Older 1.8.x pins dbus-java 4.x and crashes at runtime
+# (NoSuchMethodError) once Gradle upgrades the graph to 5.x.
+secret-service = "3.0.0-alpha"
 okio = "3.17.0"
 vlcj = "4.12.1"
 vlc = "3.0.23"
@@ -176,6 +182,9 @@ logging = { module = "org.slf4j:slf4j-android", version.ref = "slf4j" }
 newpipe-extractor = { module = "com.github.teamnewpipe:NewPipeExtractor", version.ref = "newpipe" }
 brave-extractor = { module = "com.github.maxrave-dev:BravePipeExtractor", version.ref = "brave-newpipe" }
 org-json = { module = "org.json:json", version.ref = "org-json" }
+# Desktop-only: "Import session from browser" login (read/decrypt browser cookies).
+xerial-sqlite-jdbc = { module = "org.xerial:sqlite-jdbc", version.ref = "xerial-sqlite" }
+secret-service = { module = "de.swiesend:secret-service", version.ref = "secret-service" }
 pipepipe-extractor = { module = "com.github.maxrave-dev:PipePipeExtractor", version.ref = "pipepipe" }
 #leak-canary = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanary" }
 kermit-logging = { module = "co.touchlab:kermit", version.ref = "kermit" }
