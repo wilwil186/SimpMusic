@@ -159,6 +159,13 @@ compose.desktop {
     application {
         mainClass = "com.maxrave.simpmusic.MainKt"
         jvmArgs += "--add-opens=java.base/java.nio=ALL-UNNAMED"
+        // forceLinuxWmClass() (see :desktopApp Main.kt) reflectively overwrites
+        // sun.awt.X11.XToolkit.awtAppClassName so the taskbar/dock WM_CLASS is
+        // "SimpMusic" (matching StartupWMClass in the .desktop file) instead of
+        // the raw "com-maxrave-simpmusic-MainKt" — without this open the dock
+        // shows the generic jpackage cog icon. conveyor.conf sets this for the
+        // AppImage; jpackage (packageDeb) needs it here too.
+        jvmArgs += "--add-opens=java.desktop/sun.awt.X11=ALL-UNNAMED"
 
         nativeDistributions {
             appResourcesRootDir = rootDir.resolve("vlc-natives/")
@@ -253,6 +260,48 @@ compose.desktop {
             obfuscate.set(true)
             configurationFiles.from(rootDir.resolve("composeApp/proguard-desktop-rules.pro"))
         }
+    }
+}
+
+// jpackage's generated .desktop file carries no StartupWMClass, so GNOME/KDE
+// can't bind the running window (WM_CLASS "SimpMusic", set at runtime by
+// forceLinuxWmClass) to the launcher icon — the dock falls back to the generic
+// jpackage cog and shows the raw "com-maxrave-simpmusic-MainKt" label. Patch
+// the freshly built .deb to append StartupWMClass=SimpMusic to its .desktop
+// entry. Runs after packageDeb; needs dpkg-deb + fakeroot (already required to
+// build the .deb on Linux).
+tasks.matching { it.name == "packageDeb" }.configureEach {
+    notCompatibleWithConfigurationCache("Repacks the built .deb in doLast via external dpkg-deb/fakeroot.")
+    doLast {
+        val debDir = layout.buildDirectory.dir("compose/binaries/main/deb").get().asFile
+        val deb = debDir.listFiles { f -> f.name.endsWith(".deb") }?.maxByOrNull { it.lastModified() }
+        if (deb == null) {
+            logger.warn("[deb] No .deb found to patch StartupWMClass")
+            return@doLast
+        }
+        val work = layout.buildDirectory.dir("debStartupWmClassPatch").get().asFile
+        work.deleteRecursively()
+
+        fun sh(vararg cmd: String) {
+            val code = ProcessBuilder(*cmd).inheritIO().start().waitFor()
+            if (code != 0) throw GradleException("Command failed (${code}): ${cmd.joinToString(" ")}")
+        }
+
+        sh("dpkg-deb", "-R", deb.absolutePath, work.absolutePath)
+        var patched = 0
+        work.walkTopDown()
+            .filter { it.isFile && it.name.endsWith(".desktop") }
+            .filter { it.readText().let { t -> t.contains("Name=SimpMusic") || t.contains("/opt/simpmusic/") } }
+            .forEach { d ->
+                val txt = d.readText()
+                if (!txt.contains("StartupWMClass")) {
+                    d.writeText(txt.trimEnd('\n') + "\nStartupWMClass=SimpMusic\n")
+                    patched++
+                }
+            }
+        sh("fakeroot", "dpkg-deb", "--build", work.absolutePath, deb.absolutePath)
+        work.deleteRecursively()
+        logger.lifecycle("[deb] StartupWMClass=SimpMusic patched into $patched .desktop file(s); rebuilt ${deb.name}")
     }
 }
 
